@@ -1,0 +1,90 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#segment-form {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#segment-form input,
+#segment-form button {
+  margin: 10px 0;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#segment-list,
+#jump-to-segment {
+  margin: 25px 0;
+  width: 500px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.video-js {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.segment-control {
+  cursor: pointer;
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.segment-control:hover {
+  background-color: #e0e0e0;
+}
+.video-js .vjs-progress-holder {
+  position: relative;
+}
+
+.video-js .vjs-progress-holder {
+  position: relative;
+}
+
+.segment-marker {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background-color: blue;
+  top: 0;
+  cursor: pointer;
+}
+
+.segment-tooltip {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.5s linear;
+}
+
+.segment-marker:hover .segment-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+/* hide time display on progress bar on the mouse position */
+.video-js .vjs-progress-control:hover .vjs-mouse-display {
+  display: none;
+}
