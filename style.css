@@ -1,39 +1,52 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f7;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
 }
 
 #segment-form {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 5px;
-  max-width: 500px;
-  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 30px auto;
 }
 
 #segment-form input,
-#segment-form button {
-  margin: 10px 0;
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
+#segment-form button,
 #segment-list,
 #jump-to-segment {
-  margin: 25px 0;
-  width: 500px;
-  padding: 10px;
+  margin: 10px 0;
+  padding: 12px;
+  width: 100%;
   border: 1px solid #ccc;
   border-radius: 5px;
-  display: block;
-  margin: 0 auto;
-  max-width: 500px;
+  box-sizing: border-box;
+}
+
+#segment-form button,
+#jump-to-segment {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#segment-form button:hover,
+#jump-to-segment:hover {
+  background-color: #0056b3;
 }
 
 .video-js {
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 600px;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .segment-control {
@@ -48,9 +61,6 @@ body {
 .segment-control:hover {
   background-color: #e0e0e0;
 }
-.video-js .vjs-progress-holder {
-  position: relative;
-}
 
 .video-js .vjs-progress-holder {
   position: relative;
@@ -60,17 +70,17 @@ body {
   position: absolute;
   height: 100%;
   width: 2px;
-  background-color: blue;
+  background-color: #007bff;
   top: 0;
   cursor: pointer;
 }
 
 .segment-tooltip {
   position: absolute;
-  bottom: 20px;
+  bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: black;
+  background-color: #333;
   color: white;
   padding: 2px 5px;
   border-radius: 3px;
@@ -84,7 +94,18 @@ body {
   visibility: visible;
   opacity: 1;
 }
-/* hide time display on progress bar on the mouse position */
+
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
   display: none;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 600px) {
+  #segment-form,
+  #segment-list,
+  #jump-to-segment,
+  .video-js {
+    width: 90%;
+    margin: 10px auto;
+  }
 }

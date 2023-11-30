@@ -1,9 +1,11 @@
+// Global segments array
 var segments = [
     { time: 0, label: 'Intro' },
-    { time: 60, label: 'Chapter 1' },
+    { time: 60, label: 'Chapter 1' }
     // Add more segments as needed
 ];
 
+// Initialize VideoJS player
 var player = videojs('my-video', {
     controls: true,
     fluid: true,
@@ -13,32 +15,62 @@ var player = videojs('my-video', {
         }
     }
 }, function () {
-    var player = this;
-
-    player.src({
+    this.src({
         src: 'https://cdn.bitmovin.com/content/assets/art-of-motion_drm/mpds/11331.mpd',
         type: 'application/dash+xml',
         keySystems: {
-            'com.widevine.alpha': 'https://cwip-shaka-proxy.appspot.com/no_auth',
+            'com.widevine.alpha': 'https://cwip-shaka-proxy.appspot.com/no_auth'
         }
     });
 
-
-
-    var progressHolder = player.controlBar.progressControl.el();
-    var tooltip = document.createElement('div');
-    tooltip.className = 'segment-tooltip';
+    var progressHolder = this.controlBar.progressControl.el();
+    var tooltip = createTooltip();
     progressHolder.appendChild(tooltip);
 
-    player.on('loadedmetadata', function () {
-        addMarkers(segments);
-    });
+    this.on('loadedmetadata', () => addMarkers(segments, this));
 
-    progressHolder.addEventListener('mousemove', function (e) {
+    setupTooltipEvents(progressHolder, tooltip, this);
+});
+
+// Creates a tooltip element
+function createTooltip() {
+    var tooltip = document.createElement('div');
+    tooltip.className = 'segment-tooltip';
+    return tooltip;
+}
+
+// Adds markers to the progress bar
+function addMarkers(segments, player) {
+    segments.forEach(segment => {
+        var marker = createMarker(segment, player);
+        player.controlBar.progressControl.el().appendChild(marker);
+    });
+}
+
+// Creates a marker element
+function createMarker(segment, player) {
+    var marker = document.createElement('div');
+    marker.className = 'segment-marker';
+    var positionPercent = (segment.time / player.duration()) * 100;
+    marker.style.left = positionPercent + '%';
+
+    var tooltip = document.createElement('span');
+    tooltip.className = 'segment-tooltip';
+    tooltip.textContent = segment.label;
+    marker.appendChild(tooltip);
+
+    marker.onclick = () => player.currentTime(segment.time);
+    return marker;
+}
+
+// Sets up tooltip events
+function setupTooltipEvents(progressHolder, tooltip, player) {
+    progressHolder.addEventListener('mousemove', e => {
         var rect = progressHolder.getBoundingClientRect();
         var percent = (e.pageX - rect.left) / rect.width;
         var time = percent * player.duration();
-        var nearestSegment = findNearestSegment(time, segments);
+        var nearestSegment = findNearestSegment(time, segments, player);
+
         if (nearestSegment) {
             tooltip.textContent = nearestSegment.label;
             tooltip.style.left = (percent * rect.width - tooltip.offsetWidth / 2) + 'px';
@@ -50,82 +82,50 @@ var player = videojs('my-video', {
         }
     });
 
-
-    progressHolder.addEventListener('mouseout', function () {
+    progressHolder.addEventListener('mouseout', () => {
         tooltip.style.visibility = 'hidden';
         tooltip.style.opacity = 0;
     });
+}
 
-    player.scrollToSegment = function (segmentIndex) {
-        console.log("Attempting to scroll to segment:", segmentIndex); // Debugging
-        if (segmentIndex >= 0 && segmentIndex < segments.length) {
-            var segment = segments[segmentIndex];
-            console.log("Found segment, jumping to time:", segment.time); // Debugging
-            player.currentTime(segment.time);
-        } else {
-            console.log("Invalid segment index:", segmentIndex); // Debugging
-        }
-    };
-});
-
-function addMarkers(segments) {
-    var progressHolder = player.controlBar.progressControl.el();
-
-    segments.forEach(function (segment) {
-        var marker = document.createElement('div');
-        marker.className = 'segment-marker';
-        var positionPercent = (segment.time / player.duration()) * 100;
-        marker.style.left = positionPercent + '%';
-
-        var tooltip = document.createElement('span');
-        tooltip.className = 'segment-tooltip';
-        tooltip.textContent = segment.label;
-        marker.appendChild(tooltip);
-
-        marker.onclick = function () {
-            player.currentTime(segment.time);
-        };
-
-        progressHolder.appendChild(marker);
+// Finds the nearest segment based on current time
+function findNearestSegment(time, segments, player) {
+    return segments.find((segment, index) => {
+        let end = index < segments.length - 1 ? segments[index + 1].time : player.duration();
+        return time >= segment.time && time < end;
     });
 }
 
-
-function findNearestSegment(time, segments) {
-    for (let i = 0; i < segments.length; i++) {
-        let start = segments[i].time;
-        let end = i < segments.length - 1 ? segments[i + 1].time : player.duration();
-        if (time >= start && time < end) {
-            return segments[i];
-        }
-    }
-    return null;
-}
-
-document.getElementById('add-segment').addEventListener('click', function () {
-    var time = document.getElementById('segment-time').value;
+// Event listener for adding a new segment
+document.getElementById('add-segment').addEventListener('click', () => {
+    var time = parseInt(document.getElementById('segment-time').value);
     var label = document.getElementById('segment-label').value;
     if (time && label) {
-        segments.push({ time: parseInt(time), label: label });
-        addMarkers([segments[segments.length - 1]]);
-        updateSegmentList();
+        segments.push({ time, label });
+        addMarkers([segments[segments.length - 1]], player);
+        updateSegmentList(segments);
     }
 });
 
-document.getElementById('jump-to-segment').addEventListener('click', function () {
+// Event listener for jumping to a selected segment
+document.getElementById('jump-to-segment').addEventListener('click', () => {
     var segmentIndex = document.getElementById('segment-list').value;
-    player.scrollToSegment(segmentIndex);
+    if (segmentIndex >= 0 && segmentIndex < segments.length) {
+        player.currentTime(segments[segmentIndex].time);
+    }
 });
 
-function updateSegmentList() {
+// Updates the segment selection list
+function updateSegmentList(segments) {
     var segmentList = document.getElementById('segment-list');
     segmentList.innerHTML = '';
-    segments.forEach(function (segment, index) {
+    segments.forEach((segment, index) => {
         var option = document.createElement('option');
         option.value = index;
-        option.text = segment.label + ' (' + segment.time + ' s)';
+        option.text = `${segment.label} (${segment.time} s)`;
         segmentList.appendChild(option);
     });
 }
 
-updateSegmentList();
+// Initial update of segment list
+updateSegmentList(segments);
