@@ -27,15 +27,14 @@
       />
       <input id="segment-label" type="text" placeholder="Label" />
       <button id="add-segment">Add Segment</button>
+      <select id="segment-list">
+        <!-- Options will be added dynamically -->
+      </select>
+      <button id="jump-to-segment">Jump to Segment</button>
     </div>
-    <select id="segment-list">
-      <!-- Options will be added dynamically -->
-    </select>
-    <button id="jump-to-segment">Jump to Segment</button>
     <div style="margin: 50px auto">
       <video id="my-video" class="video-js"></video>
     </div>
-
     <script>
       var player = videojs(
         "my-video",
